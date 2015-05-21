@@ -17,3 +17,4 @@ To use github, we only need several commands
 6. git pull			//This is to download the online files, same function with "svn update"
 
 * And to note that all these commands except the "clone", have to be runned under the git repository.
+* The connection is a little bit slow, be patient ;)
