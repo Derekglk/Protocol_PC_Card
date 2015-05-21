@@ -18,3 +18,4 @@ To use github, we only need several commands
 
 * And to note that all these commands except the "clone", have to be runned under the git repository.
 * The connection is a little bit slow, be patient ;)
+* It seems like that everytime before "push", we need to "add" then "commit", and we can "push".
