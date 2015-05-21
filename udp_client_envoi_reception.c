@@ -74,17 +74,17 @@ void *t_env(void * buff)
     for(j=0; j<nb; j++)
     {
 
-    //recupération d'un paquet          
+        //recupération d'un paquet          
         /*
         for(i=0;i<960;i++){
             fscanf(fs,"%d",&buffer_rec[j][i]);
         }
         */  
 
-	//envoi par paquet de 960 échantillons 
+	    //envoi par paquet de 960 échantillons 
         sendto(clientSocket,buffer_rec[j],960*sizeof(int),0,(struct sockaddr *)&serverAddr,addr_size);
         printf("paquet envoyé %d\n",j);
-	//Assurer la synchronisation entre envoi coté client et reception coté serveur 
+	    //Assurer la synchronisation entre envoi coté client et reception coté serveur 
         usleep(5000);
 
     }
