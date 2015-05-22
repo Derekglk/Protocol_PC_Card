@@ -1,0 +1,5 @@
+Pour compiler le serveur :
+
+  - il faut se placer dans le répertoire build puis taper: cmake .. -DCMAKE_BUILD_TYPE=RELEASE
+  - Ensuite faire "make" 
+  - Lancer le programme ainsi ./noisesuppressor

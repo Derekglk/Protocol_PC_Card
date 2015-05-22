@@ -1,0 +1,8 @@
+
+UDP0 : L'utilisateur tape une chaine de caractère dans le terminal où l'on a lancé le client. Le client la met dans un paquet et l'envoie au serveur. Quand le serveur reçoit le paquet, il met la chaine de caractères en majuscules, la met dans un paquet et la renvoie au client. 
+
+UDP1 : Le client lit un fichier binaire où est stockée 1sec d'une sinuoide échantillonée à 48KHz. Il envoie des paquets de 960 échantillons au serveur
+
+UDP2 : Le client lit les echantillons du fichier et les envoie. Le serveur ,quant à lui, contient deux threads qui s'exécutent simultanément. L'un s'occupe de la réception et l'autre du traitement. Un systeme de verrous permet de synchroniser les threads.
+
+UDP3 : Le client lit les echantillons du fichier car.dat codé en ASCII et envoie les paquets au serveur. Le serveur les reçoit, les débruite et les renvoie au client => Implémentation d'un thread envoi et d'un thread réception coté client et intégration de l'algorithme de débruitage coté serveur.
