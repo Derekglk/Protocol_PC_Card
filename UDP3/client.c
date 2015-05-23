@@ -35,7 +35,7 @@ Pour compiler ce programme : gcc -pthread -o nom_exec nom_fichier.c
 void *t_env(void * buff){
     printf("Creat envoi thread\n");
     int clientSocket, nBytes;
-    int buffer_rec[nb][960];
+    float buffer_rec[nb][960];
     
     int i, j=0;
 
@@ -55,6 +55,8 @@ void *t_env(void * buff){
     serverAddr.sin_port = htons(7891);
     serverAddr.sin_addr.s_addr = inet_addr("192.168.0.100"); // Ici c'est l'adresse du serveur
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
+    printf("send configuration finished\n");
+    
 
     /*Initialisation de la variable où l'on va stocker l'adresse du client*/
     addr_size = sizeof serverAddr;
@@ -66,10 +68,10 @@ void *t_env(void * buff){
         /* Lecture de 960 échantillons (int) à partir du fichier et stockage des échantillons dans buffer_rec*/
         for(i=0;i<960;i++)
         {
-            fscanf(fs,"%d",&buffer_rec[j][i]);
+            fscanf(fs,"%f\n",&buffer_rec[j][i]);
         }
     }
-    printf("buffer filled\n there are %d lines",j);
+    printf("buffer filled\n there are %d lines\n",j);
     fclose(fs);
 
     for(j=0; j<nb; j++){  
@@ -81,7 +83,7 @@ void *t_env(void * buff){
         }        
         */
         /* Envoi des échantillons au serveur*/
-        sendto(clientSocket,buffer_rec[j],960*sizeof(int),0,(struct sockaddr *)&serverAddr,addr_size);
+        sendto(clientSocket,buffer_rec[j],960*sizeof(float),0,(struct sockaddr *)&serverAddr,addr_size);
 
         usleep(6000);   
 
@@ -146,15 +148,15 @@ void *t_rec (void * buff){
 int main(){
 
     /*Déclaration des threads*/
-    pthread_t mont_rec;
+    //pthread_t mont_rec;
     pthread_t mont_env;
     
     /*Création des threads*/
     pthread_create(&mont_env,NULL,t_env,NULL);
-    pthread_create(&mont_rec,NULL,t_rec,NULL);
+    //pthread_create(&mont_rec,NULL,t_rec,NULL);
 
     /*Suspension du main en attente de l'exit des threads mont_rec et mont_rec*/
-    pthread_join (mont_rec, NULL);
+    //pthread_join (mont_rec, NULL);
     pthread_join (mont_env, NULL);
     
     return 0;

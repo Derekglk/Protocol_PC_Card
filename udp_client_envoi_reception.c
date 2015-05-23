@@ -10,7 +10,7 @@
 #include <time.h>
 #include <pthread.h>
 
-#define nb 750
+#define nb 10
 //Déclaration des verrous et conditions pour la synchronisation des threads 
 pthread_cond_t cond[nb] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
 pthread_mutex_t mutex[nb] = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
@@ -31,7 +31,7 @@ typedef struct {
 void *t_env(void * buff)
 {
 
-    printf("thread envoi \n");
+    printf("create send thread \n");
     rec *r=buff;
 
     int clientSocket, portNum, nBytes;
@@ -47,16 +47,16 @@ void *t_env(void * buff)
     //Lecture du fichier
     FILE *fs;
     fs = fopen("car.dat", "r");
-
+    printf("open car.dat \n");
     //Create UDP socket
     clientSocket = socket(PF_INET, SOCK_DGRAM, 0);
-
+    printf("create UDP socket \n");
     //Configure settings in address struct
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7891);
     serverAddr.sin_addr.s_addr = inet_addr("192.168.0.100");
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
-
+    printf("complete configure settings in address struct \n");
     //Initialize size variable to be used later on
     addr_size = sizeof serverAddr;
     
@@ -69,7 +69,7 @@ void *t_env(void * buff)
         }
     }
     fclose(fs);
-     
+    printf("buffer filled \n");
     //Envoie des nb paquets
     for(j=0; j<nb; j++)
     {
@@ -81,10 +81,10 @@ void *t_env(void * buff)
         }
         */  
 
-	    //envoi par paquet de 960 échantillons 
+        //envoi par paquet de 960 échantillons 
         sendto(clientSocket,buffer_rec[j],960*sizeof(int),0,(struct sockaddr *)&serverAddr,addr_size);
         printf("paquet envoyé %d\n",j);
-	    //Assurer la synchronisation entre envoi coté client et reception coté serveur 
+        //Assurer la synchronisation entre envoi coté client et reception coté serveur 
         usleep(5000);
 
     }
@@ -109,7 +109,7 @@ void *t_rec (void * buff)
     
     FILE *sortie2; 
     sortie2=fopen("sortie_cli.txt","w+");
-    
+    printf("create sortie_cli.txt \n")
     int i,j=0;
     int udpSocket, portNum, nBytes;
 
@@ -119,12 +119,14 @@ void *t_rec (void * buff)
     socklen_t addr_size, client_addr_size;
     //Creation d'un socket
     udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
-
+    printf("create reception socket\n")
 
     //Configure settings in address struct
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7892);
     serverAddr.sin_addr.s_addr = inet_addr("192.168.0.2");
+    printf("thread reception \n")
+    
     //Enregistrement de l'adresse 
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
     //lier le socket crée avec une adresse IP et un port  
@@ -162,6 +164,7 @@ int main()
 
     //Initialisation des Threads
     pthread_t mont_rec;
+    
     pthread_t mont_env;
 
     //Création et initialisation du buffer
@@ -180,3 +183,4 @@ int main()
 
     return 0;
 }
+// wget ftp://uestclx:liangxu@192.168.0.2/Protocol_PC_Card/UDP3/client_udp_test
