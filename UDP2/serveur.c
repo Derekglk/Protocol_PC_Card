@@ -85,7 +85,7 @@ void *t_rec (void * buff){
     /*Configure settings in address struct*/
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7891);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.0.100");
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
 
 	/*Association de l'adresse du serveur à la socket créée*/
