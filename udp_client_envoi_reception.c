@@ -1,7 +1,9 @@
 #include <sys/mount.h>
 
 /************* UDP CLIENT CODE *******************/
-
+/* Original version, there are some redundant lines*/
+/* Send size-reduced car.dat*/
+/* The version that modified in batiment K2*/
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

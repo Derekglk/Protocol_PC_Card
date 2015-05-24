@@ -21,6 +21,10 @@ Note:
 Pour compiler ce programme : gcc -pthread -o nom_exec nom_fichier.c
 ****************************************************************************/
 
+/****************************************************************************/
+/* Float Buffer has size [50][10], transfer binary file signal1.bin*/
+/* Comment reception thread and it works in a single PC with server*/
+/***************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -84,7 +88,7 @@ void *t_env(void * buff){
         /*
         for(i=0;i<960;i++){
             fscanf(fs,"%d",&buffer_rec[j][i]);
-        }        
+        }
         */
         /* Envoi des échantillons au serveur*/
         sendto(clientSocket,buffer_rec[j],10*sizeof(float),0,(struct sockaddr *)&serverAddr,addr_size);

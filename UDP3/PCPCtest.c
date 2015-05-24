@@ -21,6 +21,11 @@ Note:
 Pour compiler ce programme : gcc -pthread -o nom_exec nom_fichier.c
 ****************************************************************************/
 
+
+/****************************************************************************/
+/* Float Buffer has size [50][960], transfer binary file signal1.bin*/
+/* Comment reception thread and it works in a single PC with server*/
+/***************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
