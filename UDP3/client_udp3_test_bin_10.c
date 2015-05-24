@@ -35,7 +35,7 @@ Pour compiler ce programme : gcc -pthread -o nom_exec nom_fichier.c
 void *t_env(void * buff){
     printf("Creat envoi thread\n");
     int clientSocket, nBytes;
-    float buffer_rec[nb][960];
+    float buffer_rec[nb][10];
     
     int i, j=0;
 
@@ -65,7 +65,7 @@ void *t_env(void * buff){
     //Remplir le buffer
     for(j=0; j<nb; j++)
     {  
-        fread(buffer_rec[j],sizeof(float),960,fs);
+        fread(buffer_rec[j],sizeof(float),10,fs);
         /* Lecture de 960 échantillons (int) à partir du fichier et stockage des échantillons dans buffer_rec*/
         /*
         for(i=0;i<960;i++)
@@ -87,7 +87,7 @@ void *t_env(void * buff){
         }        
         */
         /* Envoi des échantillons au serveur*/
-        sendto(clientSocket,buffer_rec[j],960*sizeof(float),0,(struct sockaddr *)&serverAddr,addr_size);
+        sendto(clientSocket,buffer_rec[j],10*sizeof(float),0,(struct sockaddr *)&serverAddr,addr_size);
 
         usleep(6000);   
 
