@@ -30,12 +30,13 @@ Log 23 mai
 * En effet, c'est la partie où on ouvre un ficher, stocke les données dans un buffer qui nous pose toujours les problèmes.
 * A voir si on a besoin d'utiliser un tableau dynamique au lieu d'un tableau statique.
 
+
 Log 24 mai
 * Hier j'ai pensé que le problème vient de la manière dont on transmet le fichier. Cette hypothèse est basée sur un résultat suivant:
-  **La carte est sous état initial, on transmet les deux fichiers: client_udp3_test et signal1.bin
-  **Il marche pas, il affiche une error(ça peut etre une des trois errors), et la meme error nous arrive lors de plusieurs lancements.
-  **On redémarre la carte ou bien supprime les anciens fichiers, retransmet les deux fichiers et les lance
-  **Différentes errors apparaissent.
+  1) La carte est sous état initial, on transmet les deux fichiers: client_udp3_test et signal1.bin
+  2) Il marche pas, il affiche une error(ça peut etre une des trois errors), et la meme error nous arrive lors de plusieurs lancements.
+  3) On redémarre la carte ou bien supprime les anciens fichiers, retransmet les deux fichiers et les lance
+  4) Différentes errors apparaissent.
 * Donc je cherche sur Internet et trouve que wget marche en mode binaire par défaut. Et basé sur le fait que, meme si les fichiers sont mal transmis, les résuiltats de l'exécutions deveront etre identiques. De ce fait, on déduit que ce problème ne vient pas de la manière dont on transmet les fichiers.
 * Et après on se concentre sur la lecture de fichier et buffering des données.
 * Avec [50][960] ça n'a pas pu marcher, s'arretait avant buffering des données.
