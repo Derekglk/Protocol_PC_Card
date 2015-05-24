@@ -23,8 +23,27 @@ To use github, we only need several commands
 Log 23 mai
 * UDP2 tous les fichiers sont originals sauf que j'ai changé l'adresse IP dans le fichier serveur.c à 192.168.0.100
 * UDP2 udp2.c est ta version qui marche très bien
+* D'après les résultats de plusieurs essaies, le programme s'arrete juste après l'ouverture du fichier car.dat, et par fois ça entraine le blocage de système. Donc on pense que le problème vient de la taille de fichier, peut-etre l'ouverture de ce gros fichier épuise les ressources de la carte. Donc on déminue la taille de car.bin
 * UDP3 client.c J'ai changé nb=10, et dans le fichier car.dat il n'y a que 9600 échantions. car_original.dat est le fichier original. Et j'ai changé le type de tableau de int à float, aussi dans la lecture de fichier. J'ai commenté des lignes qui créent et démarent le thread de réception dans le main.
 * Dans cette version, la carte marche une ou deux fois, elle peut envoyer toutes les données(sais pas si elles sont bonnes), mais après il y a une blocage de système, je peux plus la controler; ou elle se redémare automatiquement.
 * UDP3 client_udp3_test est la version sur laquelle je suis en train de travailler. Le protocole transmet le fichier signal1.bin; je définis nb=50, et utlise 'fread' au lieu de 'fscanf', aussi 'rb' au lieu de 'r'. Dans ce cas-là, il a réussi une fois, s'arrete au milieu quelle que fois, en blocage quelle que fois. En fait, je suspecte la manière dont on transmet les exécutables.
 * En effet, c'est la partie où on ouvre un ficher, stocke les données dans un buffer qui nous pose toujours les problèmes.
 * A voir si on a besoin d'utiliser un tableau dynamique au lieu d'un tableau statique.
+
+Log 24 mai
+* Hier j'ai pensé que le problème vient de la manière dont on transmet le fichier. Cette hypothèse est basée sur un résultat suivant:
+  **La carte est sous état initial, on transmet les deux fichiers: client_udp3_test et signal1.bin
+  **Il marche pas, il affiche une error(ça peut etre une des trois errors), et la meme error nous arrive lors de plusieurs lancements.
+  **On redémarre la carte ou bien supprime les anciens fichiers, retransmet les deux fichiers et les lance
+  **Différentes errors apparaissent.
+* Donc je cherche sur Internet et trouve que wget marche en mode binaire par défaut. Et basé sur le fait que, meme si les fichiers sont mal transmis, les résuiltats de l'exécutions deveront etre identiques. De ce fait, on déduit que ce problème ne vient pas de la manière dont on transmet les fichiers.
+* Et après on se concentre sur la lecture de fichier et buffering des données.
+* Avec [50][960] ça n'a pas pu marcher, s'arretait avant buffering des données.
+* Juste pour essayer, je met la taille de tableau [50][10], ça a très bien marché, sans problème.
+* Donc maintenant on a déterminé d'où vient le problème.
+* La demande d'une espace de mémoire 50*960*int est trop grande pour la carte. Donc pour essayer la limite, je l'ai changé à [50][96], c'est à dire il y a 50 trame, chaque trame contient 96 échantillons. Mais je constate prèsque une faille parmis une vintaine exécutions. Je change la méthode de compilation 
+* "arm-uclinuxeabi-gcc -o hello hello.c -I /home/uestclx/projetS4/linux-cortexm-1.12.0/A2F/root/usr/include -mcpu=cortex-m3 -mthumb -L /home/uestclx/projetS4/linux-cortexm-1.12.0/A2F/root/usr/lib -pthread"
+* Et je constate plus ce problème, par ailleur, la compilation est plus vite.
+* Si on met la taille de tableau statique [50][96], soit on envoit 96 échantillons par paquet; soit chercher comment envoyer plusieurs trames dans un seul paquet. Je suis en train de chercher la dexième solution.
+* A voir le tableau dynamique.
+* Si on utilise un tableau statique qui est plus petit que la taille de fichier, il faut buffering des données plusieurs fois, par exemple, pour un fichier qui a 9600 valeurs, il faut buffering deux fois un tableau de taille [50][96]. A voir comment gérer ce processus.
