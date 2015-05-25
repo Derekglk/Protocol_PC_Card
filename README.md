@@ -48,3 +48,24 @@ Log 24 mai
 * Si on met la taille de tableau statique [50][96], soit on envoit 96 échantillons par paquet; soit chercher comment envoyer plusieurs trames dans un seul paquet. Je suis en train de chercher la dexième solution.
 * A voir le tableau dynamique.
 * Si on utilise un tableau statique qui est plus petit que la taille de fichier, il faut buffering des données plusieurs fois, par exemple, pour un fichier qui a 9600 valeurs, il faut buffering deux fois un tableau de taille [50][96]. A voir comment gérer ce processus.
+
+
+Log 24 Mai
+* UDP2_dat est la répertoire que j'ai crée ce soir.
+* Avec ce client et serveur, il peut transmettre correctement les données dans le fichier car.dat.
+* Mais il ne peut transmettre que 50 paquets.
+* Et il lit une trame, il l'envoit; une autre trame, l'envoit. Bien-sur qu'il ne respecte pas la contrainte de temps réel. Mais, fin, on ne travaille pas avec cette version-là.
+* A remarquer:
+* coté client
+* Le fichier est à lire en mode 'r'
+* Le buffer coté client est de type 'long'
+* use fscanf, et l'attribut doit etre cohérent avec le type de buffer, ici '%ld'
+* sizeof(long)
+* j'ai suprime usleep(5000), juste pour voir le résultat, pas grand changement, pas d'error
+* coté serveur:
+* buffer de type 'int'
+* fprintf avec l'attribut '%d'
+* sizeof(int)
+* 
+La principe c'est que, le format que le serveur utilise vaut la moitié de celui que le client utilise.
+Puis que le meme type de données dans la carte et sur le PC ne vaut pas la meme espace.
