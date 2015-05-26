@@ -69,3 +69,11 @@ Log 24 Mai
 * 
 La principe c'est que, le format que le serveur utilise vaut la moitié de celui que le client utilise.
 Puis que le meme type de données dans la carte et sur le PC ne vaut pas la meme espace.
+
+Log 25 Mai
+* Apply the same modifications to the UDP3 version which contains the dynamic table
+* And as the result, we can correctly send 50*960 values from the client to the server
+* The server can receive correctly these values and do the noise reduction, then send back the results to the client
+* The client receives these noise-reduced samples and writes them into a file.
+* The memory allocation takes about 2s, and the rest of the process runs very fast, just a blink of an eye according to my observation
+* To continue: how to send a file continuously; and push the datas toward the exit.
