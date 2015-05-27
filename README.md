@@ -77,7 +77,7 @@ Log 25 Mai
 * The client receives these noise-reduced samples and writes them into a file.
 * The memory allocation takes about 2s, and the rest of the process runs very fast, just a blink of an eye according to my observation
 * To continue: how to send a file continuously; and push the datas toward the exit.
-* 
+
 Log 27 Mai
 * Mise à jour du document tests.odt 
 * J'ai testé la dernière version d'udp3, ça marche (j'ai mis le fichier de sortie dans le dossier) (voir remarques dans tests.odt)
