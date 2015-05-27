@@ -47,6 +47,7 @@ void *t_env(void * buff){
     
 	//Allocation memoire 
 	printf("Debut allocation memoire env \n");
+	t1 = clock();
 	buffer_rec = (long **) malloc(nb*sizeof(long* ));
 
 	if (buffer_rec == NULL) {
@@ -113,7 +114,7 @@ void *t_env(void * buff){
     addr_size = sizeof serverAddr;
         
 	j=0;
-	t1 = clock();
+	
     while(j<nb){  
 		
 		/* Envoi des échantillons au serveur*/
@@ -127,8 +128,8 @@ void *t_env(void * buff){
     printf("Nombre de paquets envoyés %d \n", j);
 
 	/*Affichage du temps écoulé pour l'envoi*/
-    printf("Envoi : Nb ticks/seconde = %ld,  Nb ticks écoulés %ld\n",clk_tck, (long)(t2-t1));
-    printf("Envoi : Temps consomme (ms) : %lf \n",(double)(t2-t1)*1000/(double)clk_tck);
+    printf("Envoi : Nb ticks/seconde = %ld,  Nb ticks écoulés %ld\n",CLOCKS_PER_SEC, (long long)(t2-t1));
+    printf("Envoi : Temps consomme (s) : %lf \n",(double)(t2-t1)/CLOCKS_PER_SEC);
 	
 	/*Liberation de la memoire */
 
