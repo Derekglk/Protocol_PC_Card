@@ -83,3 +83,14 @@ Log 27 Mai
 * J'ai testé la dernière version d'udp3, ça marche (j'ai mis le fichier de sortie dans le dossier) (voir remarques dans tests.odt)
 * J'ai ajouté du code au client pour calculer le temps d'envoi et de récéption, mais on trouve toujours 0 (voir tests.odt)
 * J'ai mis cette version du client dans le dossier UDP3_dyn_long
+* ---------------------------------------------------------------------------------
+* I tested the execution time, i found that the way we used to calculate it is correct.
+* I checked all the attribut assignement, and there are no problems: t1, t2 should be of type 'clock_t', etc.
+* As I can't find the time.h dictionnary, I don't know the type of clock_t, so I changed the result of t2-ti to (long long), just in case;
+* I put the t1=clock(); to several places, and it returned me some results that seems reasonable.
+* For example, I put it in the beginning of memory allocation, and the result is about 3.55 seconds;
+* I put it just before the file reading, and the result is about 3 seconds.
+* then I changed the attribut inside the usleep() function (even to usleep(1000000)), turned out that the execution time doesn't change too much.
+* So I began to look for the contradiction between clock() and usleep(). I realized that clock() only count the time when the program is using the processor. Right now it makes sense why we always get 0.
+* When usleep(6000) is executed, the program is suspended, it doesn't use the processor, so this 6ms isn't counted into the execution time;
+* Since the processor's frequency is 166MHz, then our loop 'while' has only 50 lines to send, takes less than 1us (CLOCKS_PER_SEC=1000000, means the smallest counting unit is 1us). Of course we have 0 as it can not be more precise.
