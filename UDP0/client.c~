@@ -36,7 +36,7 @@ int main(){
 	serverAddr.sin_port = htons(7891);
 	// Affectation de l'adresse IP  
 	// La fonction inet_addr convertit une chaine de caractère contenant l'adresse IP en décimal en un format compatible avec la structure IN_ADDR
-	serverAddr.sin_addr.s_addr = inet_addr("192.168.0.100"); 
+	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
 
 	/*Initialisation de l'attribut sin_zero par 0 (On remplit tous les octets alloués à la variable à 0)*/
 	// 1er paramètre : la variable à remplir
