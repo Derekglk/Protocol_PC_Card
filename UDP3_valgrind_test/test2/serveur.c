@@ -8,11 +8,11 @@
 #define nb 750
 #define ech 960
 
-typedef struct rec{
+typedef struct {
   int buffer[nb][ech];
   int start[nb];
   int k;
-};
+}rec;
 
 
 pthread_cond_t cond[nb] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
@@ -27,8 +27,7 @@ void *t_trait (void * buff){
   int sortie[nb][ech];
   int tab[ech]; //Tableau pour mettre en forme les échantillons avant de les envoyer
 
-  rec *r;
-  r=static_cast<rec *>(buff);
+  rec *r=buff;
 
 
   int n1=0,n2=0,i;
@@ -67,9 +66,8 @@ void *t_trait (void * buff){
 
     
 void *t_rec (void * buff){
-    rec *r;
-    r=static_cast<rec *>(buff);
-
+    rec *r =buff;
+    
     int udpSocket, nBytes ,n1,n2;
     struct sockaddr_in serverAddr;
     socklen_t addr_size;

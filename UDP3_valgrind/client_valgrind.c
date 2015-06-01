@@ -95,14 +95,14 @@ void *t_rec (void * buff){
     //Initialize size variable to be used later on
     addr_size = sizeof serverAddr;  
     printf("reception begin\n");
-    while(j<700){ 
+    while(j<750){ 
         
         nBytes = recvfrom(udpSocket,b[j],960*sizeof(long),0,(struct sockaddr *)&serverStorage, &addr_size);
         
     j++;
    }
    printf("reception finished\n");
-   for(j=0;j<700;j++){
+   for(j=0;j<750;j++){
         for(i=0;i<960;i++){
             fprintf(sortie2,"%li \n",b[j][i]);
         }

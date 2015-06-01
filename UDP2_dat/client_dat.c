@@ -47,7 +47,7 @@ int main(){
     addr_size = sizeof serverAddr;
 
     /* Le fichier contient 50 paquets = 48 000 / 960  */    
-    for(j=0; j<50; j++){
+    for(j=0; j<750; j++){
         
 		/* Instant d'envoi du premier paquet*/
         if(j==0){
@@ -68,7 +68,7 @@ int main(){
     	//usleep(5000);
 
 		/* Instant d'envoi du dernier paquet*/    
-        if(j==49){
+        if(j==749){
             t2 = clock();
         }
         

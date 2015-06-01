@@ -24,14 +24,14 @@ Pour compiler ce programme : gcc -pthread -o nom_exec nom_fichier.c
 
 /* Structure contenant le buffer à partager entre les threads et les conditions d'excution ou d'arret du thread traitement*/
 typedef struct {
-  int buffer[50][960]; // Buffer contenant les échantillons
-  int start[50]; // Tableau de conditions initialement  à 0. Tant que start[j]=0 le thread traitement n'accède pas à buffer[j]. Lorsque le serveur reçoit le paquet j en entier il met la valeur 1 dans start[j] pour permettre au thread réception l'accès au paquet j. Ainsi le traitement ne s'effectuera pas sur des lignes vides du tableau mais attendra qu'elles soient remplies. 
+  int buffer[750][960]; // Buffer contenant les échantillons
+  int start[750]; // Tableau de conditions initialement  à 0. Tant que start[j]=0 le thread traitement n'accède pas à buffer[j]. Lorsque le serveur reçoit le paquet j en entier il met la valeur 1 dans start[j] pour permettre au thread réception l'accès au paquet j. Ainsi le traitement ne s'effectuera pas sur des lignes vides du tableau mais attendra qu'elles soient remplies. 
   int k; // 
 }rec;
 
 /* Les mutex servent à verouiller l'accès à des cases mémoires, les conditions servent à envoyer un signal à l'autre thread pour lui permettre de continuer son exécution. On a donc autant de verrous et de conditions que de paquets cad 50*/
-pthread_cond_t cond[50] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
-pthread_mutex_t mutex[50] = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
+pthread_cond_t cond[750] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
+pthread_mutex_t mutex[750] = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
 
 /* Thread traitement*/
 void *t_trait (void * buff){
@@ -46,7 +46,7 @@ void *t_trait (void * buff){
     FILE *sortie; 
     sortie=fopen("sortie.txt","w+");
     
-    while(j<50){     
+    while(j<750){     
 		
 		/* On verouille le mutex et on attend que la condition (*r).start[j] )= 1 soit réalisée. Des qu'elle est réalisée on déverouille le mutex */
         pthread_mutex_lock(&mutex[j]);  
@@ -91,7 +91,7 @@ void *t_rec (void * buff){
 	/*Association de l'adresse du serveur à la socket créée*/
     bind(udpSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
 
-    while((*r).k<50){
+    while((*r).k<750){
     	
 		/* Verouillage du mutex tant que le paquet n'est pas entièrement reçu*/
         pthread_mutex_lock(&mutex[(*r).k]);
