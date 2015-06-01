@@ -8,11 +8,11 @@
 #define nb 750
 #define ech 960
 
-typedef struct {
-  long buffer[nb][ech];
+typedef struct rec{
+  int buffer[nb][ech];
   int start[nb];
   int k;
-}rec;
+};
 
 
 pthread_cond_t cond[nb] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
@@ -24,10 +24,11 @@ void *t_trait (void * buff){
   socklen_t addr_size;
   int udpSocket;
 
-  long sortie[nb][ech];
-  long tab[ech]; //Tableau pour mettre en forme les échantillons avant de les envoyer
+  int sortie[nb][ech];
+  int tab[ech]; //Tableau pour mettre en forme les échantillons avant de les envoyer
 
-  rec *r=buff;
+  rec *r;
+  r=static_cast<rec *>(buff);
 
 
   int n1=0,n2=0,i;
@@ -56,7 +57,7 @@ void *t_trait (void * buff){
              pthread_mutex_unlock(&mutex[n1]);
             
 
-		sendto(udpSocket,(*r).buffer[n1],960*sizeof(long),0,(struct sockaddr *)&serverAddr,addr_size);	     
+		sendto(udpSocket,(*r).buffer[n1],960*sizeof(int),0,(struct sockaddr *)&serverAddr,addr_size);	     
        printf("Paquet envoyé %d\n",n1);
         }
        
@@ -66,8 +67,9 @@ void *t_trait (void * buff){
 
     
 void *t_rec (void * buff){
-    rec *r =buff;
-    
+    rec *r;
+    r=static_cast<rec *>(buff);
+
     int udpSocket, nBytes ,n1,n2;
     struct sockaddr_in serverAddr;
     socklen_t addr_size;
@@ -89,7 +91,7 @@ void *t_rec (void * buff){
 
       //Verouillage du mutex en attente de la réception complète du paquet*/
         pthread_mutex_lock(&mutex[(*r).k]);
-        nBytes = recvfrom(udpSocket,(*r).buffer[(*r).k],960*sizeof(long),0,NULL,NULL);
+        nBytes = recvfrom(udpSocket,(*r).buffer[(*r).k],960*sizeof(int),0,NULL,NULL);
 
         (*r).start[(*r).k]=1;
 
