@@ -5,18 +5,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
-#define nb 750
+#define nb 1000
+#define nb_trames 7500
 #define ech 960
 
 typedef struct {
-  int buffer[nb][ech];
+  long buffer[nb][ech];
   int start[nb];
   int k;
 }rec;
 
 
-pthread_cond_t cond[nb] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
-pthread_mutex_t mutex[nb] = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
+pthread_cond_t cond[nb_trames] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
+pthread_mutex_t mutex[nb_trames] = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
     
 void *t_trait (void * buff){
 
@@ -24,14 +25,11 @@ void *t_trait (void * buff){
   socklen_t addr_size;
   int udpSocket;
 
-  int sortie[nb][ech];
-  int tab[ech]; //Tableau pour mettre en forme les échantillons avant de les envoyer
-
   rec *r=buff;
 
 
   int n1=0,n2=0,i;
-
+    int k;
 
     
     //Creation de la socket UDP
@@ -46,18 +44,20 @@ void *t_trait (void * buff){
     //Initialisation de la taille de l'adresse du client
     addr_size = sizeof serverAddr; 
    
-	for (n1 = 0; n1 < 750; n1++)
+	for (n1 = 0; n1 < nb_trames; n1++)
 	{
+	    k= n1 % nb;
 	  /*Verouillage du mutex et attente de la réception du paquet entier*/
-             pthread_mutex_lock(&mutex[n1]);   
-             while ((*r).start[n1] == 0) {
-             pthread_cond_wait(&cond[n1], &mutex[n1]);
+             pthread_mutex_lock(&mutex[k]);   
+             while ((*r).start[k] == 0) {
+             pthread_cond_wait(&cond[k], &mutex[k]);
 	     }
-             pthread_mutex_unlock(&mutex[n1]);
+             pthread_mutex_unlock(&mutex[k]);
             
 
-		sendto(udpSocket,(*r).buffer[n1],960*sizeof(int),0,(struct sockaddr *)&serverAddr,addr_size);	     
+		sendto(udpSocket,(*r).buffer[k],960*sizeof(long),0,(struct sockaddr *)&serverAddr,addr_size);	     
        printf("Paquet envoyé %d\n",n1);
+       (*r).start[k]=0;
         }
        
         
@@ -67,11 +67,11 @@ void *t_trait (void * buff){
     
 void *t_rec (void * buff){
     rec *r =buff;
-    printf("int fait %d\n", sizeof(int));
-    printf("long fait %li\n",sizeof(long));
+    
     int udpSocket, nBytes ,n1,n2;
     struct sockaddr_in serverAddr;
     socklen_t addr_size;
+    int p;
     
     //Création de la socket UDP
     udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
@@ -86,19 +86,19 @@ void *t_rec (void * buff){
     bind(udpSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
    
     //Réception des paquets
-    while((*r).k<nb){
-
+    while((*r).k<nb_trames){
+        p= (*r).k % nb;
       //Verouillage du mutex en attente de la réception complète du paquet*/
-        pthread_mutex_lock(&mutex[(*r).k]);
-        nBytes = recvfrom(udpSocket,(*r).buffer[(*r).k],960*sizeof(int),0,NULL,NULL);
+        pthread_mutex_lock(&mutex[p]);
+        nBytes = recvfrom(udpSocket,(*r).buffer[p],960*sizeof(long),0,NULL,NULL);
 
-        (*r).start[(*r).k]=1;
+        (*r).start[p]=1;
 
         printf("Paquet recu %d\n",(*r).k);
 
 		//Déverouillage du mutex
-        pthread_cond_signal(&cond[(*r).k]); 
-        pthread_mutex_unlock(&mutex[(*r).k]);
+        pthread_cond_signal(&cond[p]); 
+        pthread_mutex_unlock(&mutex[p]);
   
         (*r).k=(*r).k+1;
     } 

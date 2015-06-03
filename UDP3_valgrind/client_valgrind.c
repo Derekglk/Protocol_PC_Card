@@ -66,8 +66,8 @@ void *t_env(void * buff){
 void *t_rec (void * buff){
 
     printf("thread reception \n");
-    int p=sizeof(long);
-    printf("%d",p);
+    int p=sizeof(int);
+    printf("%d\n",p);
     
 
     

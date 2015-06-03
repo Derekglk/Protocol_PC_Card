@@ -67,7 +67,7 @@ void *t_trait (void * buff){
     
 void *t_rec (void * buff){
     rec *r =buff;
-    printf("int fait %d\n", sizeof(int));
+    printf("int fait %ld\n", sizeof(int));
     printf("long fait %li\n",sizeof(long));
     int udpSocket, nBytes ,n1,n2;
     struct sockaddr_in serverAddr;
