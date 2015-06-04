@@ -59,7 +59,7 @@ void *t_env(void * buff){
          
         sendto(clientSocket,buffer_rec,960*sizeof(long),0,(struct sockaddr *)&serverAddr,addr_size);
       printf("paquets envoyé %d \n",n2);
-        usleep(6000);   
+        usleep(1000000);   
 
 
 

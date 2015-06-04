@@ -37,7 +37,7 @@ void *t_trait (void * buff){
 
     //Initialisation de l'adresse du client
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr =inet_addr("127.0.0.1"); 
+    serverAddr.sin_addr.s_addr =inet_addr("192.168.0.2"); 
     serverAddr.sin_port = htons(7892);
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
 
@@ -78,7 +78,7 @@ void *t_rec (void * buff){
 
     //Initialisation de l'adresse du serveur 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr =16777343; 
+    serverAddr.sin_addr.s_addr =1677764800; 
     serverAddr.sin_port = htons(7891);
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
 

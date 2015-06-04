@@ -52,7 +52,7 @@ void *t_env(void * buff){
     //Configure settings in address struct
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7891);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.0.100");
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
 
     //Initialize size variable to be used later on
@@ -95,7 +95,7 @@ void *t_rec (void * buff){
     //Configure settings in address struct
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7892);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.0.2");
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
     
     bind(udpSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
