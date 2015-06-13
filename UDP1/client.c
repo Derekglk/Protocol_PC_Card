@@ -27,7 +27,7 @@ int main(){
 
     /*Ouverture du fichier*/
     FILE *fs;
-    fs = fopen("signal1.txt", "rb");
+    fs = fopen("signal1.bin", "rb");
 
     struct sockaddr_in serverAddr;
     socklen_t addr_size;
@@ -38,7 +38,7 @@ int main(){
 	/*Configuration des attributs de la variable serverAddr */
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7891);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddr.sin_addr.s_addr = inet_addr("192.168.0.100");
 
 	/*Initialisation de l'attribut sin_zero par 0 (On remplit tous les octets alloués à la variable à 0)*/
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
