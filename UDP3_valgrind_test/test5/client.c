@@ -22,6 +22,8 @@ typedef struct {
   int m;
 }rec;
 
+clock_t t1, t2;
+
 pthread_cond_t cond[nb] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
 pthread_mutex_t mutex[nb] = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
 
@@ -42,7 +44,11 @@ void *t_lec(void * buff){
     int n1;
 
     while((*r).m< nb_trames){
-     
+        
+        if((*r).m==0){
+            t1=clock();
+        }
+        
         p = (*r).m % nb;
         
         pthread_mutex_lock(&mutex1[p]);
@@ -53,7 +59,10 @@ void *t_lec(void * buff){
         
         (*r).start1[p]=1;
 
-        printf("Paquet lu %d\n",(*r).m);
+        if((*r).m==(nb_trames-1)){
+            printf("Paquet lu %d\n",(*r).m);
+        }
+        
         usleep(6000);   
 
         pthread_cond_signal(&cond1[p]); 
@@ -99,8 +108,10 @@ void *t_env(void * buff){
              pthread_mutex_unlock(&mutex1[p]);
 
         sendto(clientSocket,(*r).buffer_env[p],960*sizeof(long),0,(struct sockaddr *)&serverAddr,addr_size);
+        if(n2==(nb_trames-1)){
+            printf("paquet envoyé %d \n",n2);
+        }
         
-        printf("paquet envoyé %d \n",n2);
         
         (*r).start1[p]=0;
         usleep(6000);   
@@ -146,8 +157,10 @@ void *t_rec (void * buff){
         
         nBytes = recvfrom(udpSocket,(*r).buffer_rec[p],960*sizeof(long),0,(struct sockaddr *)&serverStorage, &addr_size);
         (*r).start[p]=1;
-
-        printf("Paquet recu %d\n",(*r).k);
+        if((*r).k== (nb_trames-1)){
+            printf("Paquet recu %d\n",(*r).k);
+        }
+        
 
 		//Déverouillage du mutex
         pthread_cond_signal(&cond[p]); 
@@ -185,10 +198,18 @@ void *t_ecr (void * buff){
        for(i=0;i<ech;i++){
            fprintf(sortie2,"%li \n",(*r).buffer_rec[p][i]);
        }
-        
-       printf("Paquet ecrit %d\n",n1);
+       if(n1%50==0){
+        printf("Paquet ecrit %d\n",n1);
+       } 
+       
        (*r).start[p]=0;
-        }
+       
+       if(n1==(nb_trames-1)){
+            t2=clock();
+       }
+     
+     }
+     printf("Temps consomme (s) : %lf \n",(double)(t2-t1)/(double)CLOCKS_PER_SEC);
        
 }
 

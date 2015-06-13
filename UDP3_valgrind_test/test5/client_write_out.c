@@ -107,7 +107,7 @@ void *t_env(void * buff){
 
         sendto(clientSocket,(*r).buffer_env[p],960*sizeof(long),0,(struct sockaddr *)&serverAddr,addr_size);
         
-        printf("paquet envoyé %d \n",n2);
+        printf("Paquet envoyé %d \n",n2);
         
         (*r).start1[p]=0;
         usleep(6000);   
@@ -187,14 +187,15 @@ void *t_ecr (void * buff){
   DEBUG_PRINT1("FIFO processing...");
 
   pthread_mutex_lock(&mutex[0]);
-
+  printf("1\n");
   while ((*r).start[0] == 0) {
 
         pthread_cond_wait(&cond[0], &mutex[0]);
 
   }
-
+  printf("2\n");
 	fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, &((*r).buffer_rec[0]), FIFO_HALF_SIZE);
+  printf('First paquet sent to the output jack');
   //buffer_0_p += FIFO_HALF_SIZE;
   fpga_write(FIFO_ENABLE, 0xffffffff);
   (*r).start[0]=0;
@@ -225,10 +226,10 @@ void *t_ecr (void * buff){
       }
 
       fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, &((*r).buffer_rec[p]),FIFO_HALF_SIZE);
-      
-      printf("Paquet ecrit %d\n",n1);
-      (*r).start[p]=0;
       pthread_mutex_unlock(&mutex[p]);
+      printf("Paquet send to the output jack %d\n",n1);
+      (*r).start[p]=0;
+      
   }
   DEBUG_PRINT1("FIFO ...end");
        
