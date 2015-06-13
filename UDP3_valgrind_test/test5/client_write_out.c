@@ -7,11 +7,18 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include "config.c"
+#include <unistd.h>
+#include "debug.h"
+#include "FIFO_reg.h"
+#include <fcntl.h>
 
 #define nb 500
 #define nb_trames 750
 #define ech 960
 
+#define FRAME_SIZE 960
+#define SAMPLING_FREQUENCY 48000
 
 typedef struct {
   long buffer_env[nb][ech];
