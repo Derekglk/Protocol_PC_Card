@@ -178,6 +178,14 @@ void *t_ecr (void * buff){
 
   int n1=0,n2=0,i;
   int p;
+  int gpio;
+
+  DEBUG_PRINT1("fpga version = %x", fpga_read(FPGA_VERSION));
+
+  DEBUG_PRINT1("open file...");
+
+  //向操作系统请求打开文件 只写模式
+  gpio = open("/sys/class/gpio/gpio1/value", O_WRONLY);
 
   //***********************************************************
   //不知道为什么要先发第一个包 而不写到循环里
