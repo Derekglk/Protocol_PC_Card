@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -67,7 +68,7 @@ void *t_lec(void * buff){
         (*r).start1[p]=1;
 
         printf("Paquet lu %d\n",(*r).m);
-        usleep(6000);   
+        //usleep(6000);   
   
         (*r).m=(*r).m+1;
         pthread_cond_signal(&cond1[p]); 
@@ -115,7 +116,7 @@ void *t_env(void * buff){
         printf("Paquet envoyé %d \n",n2);
         
         (*r).start1[p]=0;
-        usleep(6000);   
+        //usleep(6000);   
         pthread_mutex_unlock(&mutex1[p]);
     }
     
@@ -185,7 +186,7 @@ void *t_ecr (void * buff){
   int n1=0,n2=0,i;
   int p;
   int gpio;
-
+  int gpio_test = 0;
   DEBUG_PRINT1("fpga version = %x", fpga_read(FPGA_VERSION));
 
   DEBUG_PRINT1("open file...");
@@ -208,7 +209,7 @@ void *t_ecr (void * buff){
 
   }
   printf("2\n");
-  int *buffer_rec_p = r->buffer_rec;
+  int *buffer_rec_p = r->buffer_rec[0];
   fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, buffer_rec_p, FIFO_HALF_SIZE);
   //buffer_rec_p += FIFO_HALF_SIZE;
   printf("First paquet sent to the output jack\n");
@@ -242,7 +243,15 @@ void *t_ecr (void * buff){
       */
       while ((0x4 & fpga_read(FIFO_DL_STATUS)) == 0) {
         //printf("5\n");
+          if (gpio_test == 0) {
+          gpio_test = 1;
+          write(gpio, "1", 1);
+        }
+      }
 
+      if (gpio_test == 1) {
+      gpio_test = 0;
+      write(gpio, "0", 1);
       }
 
       fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, (buffer_rec_p+p),FIFO_HALF_SIZE);
@@ -259,7 +268,7 @@ void *t_ecr (void * buff){
       
     }
 
-    
+  close(gpio);
   DEBUG_PRINT1("FIFO ...end");
   printf("Temps consomme (s) : %lf \n",(double)(t2-t1)/(double)CLOCKS_PER_SEC);     
 }
