@@ -21,8 +21,8 @@
 #define SAMPLING_FREQUENCY 48000
 
 typedef struct {
-  long buffer_env[nb][ech];
-  long buffer_rec[nb][ech];
+  int buffer_env[nb][ech];
+  int buffer_rec[nb][ech];
   int start[nb];
   int start1[nb];
   int k;
@@ -55,7 +55,7 @@ void *t_lec(void * buff){
         pthread_mutex_lock(&mutex1[p]);
         
         for(n1=0;n1<960;n1++){
-            fscanf(fs,"%li",&((*r).buffer_env[p][n1]));
+            fscanf(fs,"%d",&((*r).buffer_env[p][n1]));
         }
         
         (*r).start1[p]=1;
@@ -105,7 +105,7 @@ void *t_env(void * buff){
 	     }
              pthread_mutex_unlock(&mutex1[p]);
 
-        sendto(clientSocket,(*r).buffer_env[p],960*sizeof(long),0,(struct sockaddr *)&serverAddr,addr_size);
+        sendto(clientSocket,(*r).buffer_env[p],960*sizeof(int),0,(struct sockaddr *)&serverAddr,addr_size);
         
         printf("Paquet envoyé %d \n",n2);
         
@@ -151,7 +151,7 @@ void *t_rec (void * buff){
       //Verouillage du mutex en attente de la réception complète du paquet*/
         pthread_mutex_lock(&mutex[p]);
         
-        nBytes = recvfrom(udpSocket,(*r).buffer_rec[p],960*sizeof(long),0,(struct sockaddr *)&serverStorage, &addr_size);
+        nBytes = recvfrom(udpSocket,(*r).buffer_rec[p],960*sizeof(int),0,(struct sockaddr *)&serverStorage, &addr_size);
         (*r).start[p]=1;
 
         printf("Paquet recu %d\n",(*r).k);
@@ -202,7 +202,9 @@ void *t_ecr (void * buff){
 
   }
   printf("2\n");
-	fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, &((*r).buffer_rec[0]), FIFO_HALF_SIZE);
+  int *buffer_rec_p = r->buffer_rec;
+	fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, buffer_rec_p, FIFO_HALF_SIZE);
+  //buffer_rec_p += FIFO_HALF_SIZE;
   printf('First paquet sent to the output jack');
   //buffer_0_p += FIFO_HALF_SIZE;
   fpga_write(FIFO_ENABLE, 0xffffffff);
@@ -233,7 +235,7 @@ void *t_ecr (void * buff){
 
       }
 
-      fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, &((*r).buffer_rec[p]),FIFO_HALF_SIZE);
+      fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, (buffer_rec_p+p),FIFO_HALF_SIZE);
       pthread_mutex_unlock(&mutex[p]);
       printf("Paquet send to the output jack %d\n",n1);
       (*r).start[p]=0;
