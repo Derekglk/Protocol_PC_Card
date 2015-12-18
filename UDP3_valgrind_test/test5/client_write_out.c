@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -29,6 +30,8 @@ typedef struct {
   int m;
 }rec;
 
+clock_t t1, t2;
+
 pthread_cond_t cond[nb] = PTHREAD_COND_INITIALIZER; /* Création de la condition */
 pthread_mutex_t mutex[nb] = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
 
@@ -49,7 +52,11 @@ void *t_lec(void * buff){
     int n1;
 
     while((*r).m< nb_trames){
-     
+        
+        if((*r).m==0){
+            t1=clock();
+        }
+
         p = (*r).m % nb;
         
         pthread_mutex_lock(&mutex1[p]);
@@ -61,12 +68,11 @@ void *t_lec(void * buff){
         (*r).start1[p]=1;
 
         printf("Paquet lu %d\n",(*r).m);
-        usleep(6000);   
-
-        pthread_cond_signal(&cond1[p]); 
-        pthread_mutex_unlock(&mutex1[p]);
+        //usleep(6000);   
   
         (*r).m=(*r).m+1;
+        pthread_cond_signal(&cond1[p]); 
+        pthread_mutex_unlock(&mutex1[p]);
     }
     
 
@@ -102,16 +108,16 @@ void *t_env(void * buff){
         pthread_mutex_lock(&mutex1[p]);   
              while ((*r).start1[p] == 0) {
              pthread_cond_wait(&cond1[p], &mutex1[p]);
-	     }
-             pthread_mutex_unlock(&mutex1[p]);
+       }
+             
 
         sendto(clientSocket,(*r).buffer_env[p],960*sizeof(int),0,(struct sockaddr *)&serverAddr,addr_size);
         
         printf("Paquet envoyé %d \n",n2);
         
         (*r).start1[p]=0;
-        usleep(6000);   
-
+        //usleep(6000);   
+        pthread_mutex_unlock(&mutex1[p]);
     }
     
   //printf("paquet envoyés %d\n",n2);
@@ -156,11 +162,12 @@ void *t_rec (void * buff){
 
         printf("Paquet recu %d\n",(*r).k);
 
-		//Déverouillage du mutex
-        pthread_cond_signal(&cond[p]); 
-        pthread_mutex_unlock(&mutex[p]);
+    //Déverouillage du mutex
+        
   
         (*r).k=(*r).k+1;
+        pthread_cond_signal(&cond[p]); 
+        pthread_mutex_unlock(&mutex[p]);
    }
    
      // printf("paquets reçu %d \n",j);
@@ -179,7 +186,7 @@ void *t_ecr (void * buff){
   int n1=0,n2=0,i;
   int p;
   int gpio;
-
+  int gpio_test = 0;
   DEBUG_PRINT1("fpga version = %x", fpga_read(FPGA_VERSION));
 
   DEBUG_PRINT1("open file...");
@@ -202,10 +209,10 @@ void *t_ecr (void * buff){
 
   }
   printf("2\n");
-  int *buffer_rec_p = r->buffer_rec;
-	fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, buffer_rec_p, FIFO_HALF_SIZE);
+  int *buffer_rec_p = r->buffer_rec[0];
+  fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, buffer_rec_p, FIFO_HALF_SIZE);
   //buffer_rec_p += FIFO_HALF_SIZE;
-  printf('First paquet sent to the output jack');
+  printf("First paquet sent to the output jack\n");
   //buffer_0_p += FIFO_HALF_SIZE;
   fpga_write(FIFO_ENABLE, 0xffffffff);
   (*r).start[0]=0;
@@ -213,17 +220,20 @@ void *t_ecr (void * buff){
   //第一个包的发送到此结束
   //***********************************************************
 
-  for (n1 = 1; n1 < nb_trames; n1++){
+  n1 = 1;
+  while(n1 < nb_trames){
 
-	    p= n1 % nb;
-	  /*Verouillage du mutex et attente de la réception du paquet entier*/
+      p= n1 % nb;
+    /*Verouillage du mutex et attente de la réception du paquet entier*/
       pthread_mutex_lock(&mutex[p]); 
 
       while ((*r).start[p] == 0) {
 
         pthread_cond_wait(&cond[p], &mutex[p]);
+        printf("3\n");
 
-	    }
+      }
+      //printf("4\n");
       /*
       for(i=0;i<ech;i++){
 
@@ -232,17 +242,35 @@ void *t_ecr (void * buff){
       }
       */
       while ((0x4 & fpga_read(FIFO_DL_STATUS)) == 0) {
+        //printf("5\n");
+          if (gpio_test == 0) {
+          gpio_test = 1;
+          write(gpio, "1", 1);
+        }
+      }
 
+      if (gpio_test == 1) {
+      gpio_test = 0;
+      write(gpio, "0", 1);
       }
 
       fpga_fifo_write_buffer_shift(FIFO_DL_WRITE, (buffer_rec_p+p),FIFO_HALF_SIZE);
-      pthread_mutex_unlock(&mutex[p]);
+      
       printf("Paquet send to the output jack %d\n",n1);
       (*r).start[p]=0;
+
+      if(n1==(nb_trames-1)){
+            t2=clock();
+      }
+
+      n1+=1;
+      pthread_mutex_unlock(&mutex[p]);
       
-  }
+    }
+
+  close(gpio);
   DEBUG_PRINT1("FIFO ...end");
-       
+  printf("Temps consomme (s) : %lf \n",(double)(t2-t1)/(double)CLOCKS_PER_SEC);     
 }
 
 int main(){
